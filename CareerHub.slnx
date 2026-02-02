@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="CareerHub.ApiService/CareerHub.ApiService.csproj" />
+  <Project Path="CareerHub.AppHost/CareerHub.AppHost.csproj" />
+  <Project Path="CareerHub.ServiceDefaults/CareerHub.ServiceDefaults.csproj" />
+  <Project Path="CareerHub.Tests/CareerHub.Tests.csproj" />
+  <Project Path="CareerHub.Web/CareerHub.Web.csproj" />
+</Solution>
