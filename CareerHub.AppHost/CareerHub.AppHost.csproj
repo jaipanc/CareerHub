@@ -11,13 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CareerHub.ApiService\CareerHub.ApiService.csproj" />
-    <ProjectReference Include="..\CareerHub.Web\CareerHub.Web.csproj" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="9.5.0" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.0" />
-    <PackageReference Include="Aspire.Hosting.Redis" Version="9.5.0" />
+    <ProjectReference Include="..\CareerHub.API\CareerHub.API.csproj" />
   </ItemGroup>
 
 </Project>

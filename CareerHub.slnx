@@ -1,7 +1,5 @@
 <Solution>
-  <Project Path="CareerHub.ApiService/CareerHub.ApiService.csproj" />
+  <Project Path="CareerHub.API/CareerHub.API.csproj" Id="5e1268ac-5514-4194-9407-a9af78410978" />
   <Project Path="CareerHub.AppHost/CareerHub.AppHost.csproj" />
   <Project Path="CareerHub.ServiceDefaults/CareerHub.ServiceDefaults.csproj" />
-  <Project Path="CareerHub.Tests/CareerHub.Tests.csproj" />
-  <Project Path="CareerHub.Web/CareerHub.Web.csproj" />
 </Solution>

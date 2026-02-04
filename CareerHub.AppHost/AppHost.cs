@@ -2,15 +2,10 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
 
-var apiService = builder.AddProject<Projects.CareerHub_ApiService>("apiservice")
-    .WithHttpHealthCheck("/health");
+var sql = builder.AddSqlServer("sql")
+                 .AddDatabase("career-db");
 
-builder.AddProject<Projects.CareerHub_Web>("webfrontend")
-    .WithExternalHttpEndpoints()
-    .WithHttpHealthCheck("/health")
-    .WithReference(cache)
-    .WaitFor(cache)
-    .WithReference(apiService)
-    .WaitFor(apiService);
+builder.AddProject<Projects.CareerHub_API>("api")
+       .WithReference(sql);
 
 builder.Build().Run();
