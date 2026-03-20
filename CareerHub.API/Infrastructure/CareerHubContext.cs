@@ -10,31 +10,31 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
     // =========================================================================
 
     // System reference data
-    public DbSet<SystemCountryCode>   SystemCountryCodes   { get; set; }
-    public DbSet<SystemLanguageCode>  SystemLanguageCodes  { get; set; }
+    public DbSet<SystemCountryCode> SystemCountryCodes { get; set; }
+    public DbSet<SystemLanguageCode> SystemLanguageCodes { get; set; }
 
     // Applicant domain
-    public DbSet<ApplicantProfile>        ApplicantProfiles        { get; set; }
-    public DbSet<ApplicantEducation>      ApplicantEducations      { get; set; }
+    public DbSet<ApplicantProfile> ApplicantProfiles { get; set; }
+    public DbSet<ApplicantEducation> ApplicantEducations { get; set; }
     public DbSet<ApplicantJobApplication> ApplicantJobApplications { get; set; }
-    public DbSet<ApplicantResume>         ApplicantResumes         { get; set; }
-    public DbSet<ApplicantSkill>          ApplicantSkills          { get; set; }
-    public DbSet<ApplicantWorkHistory>    ApplicantWorkHistory     { get; set; }
+    public DbSet<ApplicantResume> ApplicantResumes { get; set; }
+    public DbSet<ApplicantSkill> ApplicantSkills { get; set; }
+    public DbSet<ApplicantWorkHistory> ApplicantWorkHistory { get; set; }
 
     // Company domain
-    public DbSet<CompanyProfile>        CompanyProfiles        { get; set; }
-    public DbSet<CompanyDescription>    CompanyDescriptions    { get; set; }
-    public DbSet<CompanyJob>            CompanyJobs            { get; set; }
+    public DbSet<CompanyProfile> CompanyProfiles { get; set; }
+    public DbSet<CompanyDescription> CompanyDescriptions { get; set; }
+    public DbSet<CompanyJob> CompanyJobs { get; set; }
     public DbSet<CompanyJobDescription> CompanyJobDescriptions { get; set; }
-    public DbSet<CompanyJobEducation>   CompanyJobEducations   { get; set; }
-    public DbSet<CompanyJobSkill>       CompanyJobSkills       { get; set; }
-    public DbSet<CompanyLocation>       CompanyLocations       { get; set; }
+    public DbSet<CompanyJobEducation> CompanyJobEducations { get; set; }
+    public DbSet<CompanyJobSkill> CompanyJobSkills { get; set; }
+    public DbSet<CompanyLocation> CompanyLocations { get; set; }
 
     // Security domain
-    public DbSet<SecurityLogin>       SecurityLogins       { get; set; }
-    public DbSet<SecurityLoginsLog>   SecurityLoginsLogs   { get; set; }
-    public DbSet<SecurityRole>        SecurityRoles        { get; set; }
-    public DbSet<SecurityLoginsRole>  SecurityLoginsRoles  { get; set; }
+    public DbSet<SecurityLogin> SecurityLogins { get; set; }
+    public DbSet<SecurityLoginsLog> SecurityLoginsLogs { get; set; }
+    public DbSet<SecurityRole> SecurityRoles { get; set; }
+    public DbSet<SecurityLoginsRole> SecurityLoginsRoles { get; set; }
 
     // =========================================================================
     // Model configuration — all column names map to the EXISTING DB schema.
@@ -44,6 +44,12 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
     protected override void OnModelCreating(ModelBuilder m)
     {
         base.OnModelCreating(m);
+
+        // ── FIX: Pin every table to the dbo schema explicitly. ───────────────
+        // Without this, EF Core generates unqualified table names and SQL Server
+        // resolves them against the DB user's default schema — which may not be
+        // dbo, causing "Invalid object name 'Security_Logins'" at runtime.
+        m.HasDefaultSchema("dbo");
 
         // ── SYSTEM ──────────────────────────────────────────────────────────
         m.Entity<SystemCountryCode>(e =>
@@ -78,7 +84,7 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
             e.Property(p => p.PhoneNumber).HasColumnName("Phone_Number");
             e.Property(p => p.FullName).HasColumnName("Full_Name");
             e.Property(p => p.ForceChangePassword).HasColumnName("Force_Change_Password");
-            // NOTE: "Prefferred_Language" is the real DB column name (typo with double-f). Do not fix.
+            // NOTE: "Prefferred_Language" is the real DB column name (double-f typo). Do not fix.
             e.Property(p => p.PrefferredLanguage).HasColumnName("Prefferred_Language");
             e.Property(p => p.TimeStamp).HasColumnName("Time_Stamp").IsRowVersion();
         });
@@ -89,7 +95,7 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
             e.Property(p => p.LoginId).HasColumnName("Login");
             e.Property(p => p.SourceIP).HasColumnName("Source_IP");
             e.Property(p => p.LogonDate).HasColumnName("Logon_Date");
-            // NOTE: "Is_Succesful" is the real DB column name (typo, single-s). Do not fix.
+            // NOTE: "Is_Succesful" is the real DB column name (single-s typo). Do not fix.
             e.Property(p => p.IsSuccesful).HasColumnName("Is_Succesful");
 
             e.HasOne(p => p.Login)
@@ -177,7 +183,6 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
         {
             e.ToTable("Applicant_Resumes");
             e.Property(p => p.ApplicantId).HasColumnName("Applicant");
-            // DB column name is "Resume" — C# property is ResumeContent to avoid class name clash
             e.Property(p => p.ResumeContent).HasColumnName("Resume");
             e.Property(p => p.LastUpdated).HasColumnName("Last_Updated");
 
@@ -249,7 +254,6 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
             e.Property(p => p.CompanyId).HasColumnName("Company");
             e.Property(p => p.LanguageId).HasColumnName("LanguageId");
             e.Property(p => p.CompanyName).HasColumnName("Company_Name");
-            // DB column is "Company_Description" — C# property is Description to avoid class name clash
             e.Property(p => p.Description).HasColumnName("Company_Description");
             e.Property(p => p.TimeStamp).HasColumnName("Time_Stamp").IsRowVersion();
 
@@ -283,7 +287,6 @@ public class CareerHubContext(DbContextOptions<CareerHubContext> options) : DbCo
             e.ToTable("Company_Jobs_Descriptions");
             e.Property(p => p.JobId).HasColumnName("Job");
             e.Property(p => p.JobName).HasColumnName("Job_Name");
-            // DB column is "Job_Descriptions" — C# property is Description to avoid plural confusion
             e.Property(p => p.Description).HasColumnName("Job_Descriptions");
             e.Property(p => p.TimeStamp).HasColumnName("Time_Stamp").IsRowVersion();
 

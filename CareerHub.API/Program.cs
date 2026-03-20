@@ -23,7 +23,7 @@ public class Program
         // =====================================================================
         // 2. DATABASE — EF Core via Aspire (reads "careercloud-db" from config)
         // =====================================================================
-        builder.AddSqlServerDbContext<CareerHubContext>("JOB_PORTAL_DB");
+        builder.AddSqlServerDbContext<CareerHubContext>("careercloud-db");
 
         // =====================================================================
         // 3. AUTH — JWT bearer + strongly-typed config
