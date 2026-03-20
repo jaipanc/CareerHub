@@ -1,11 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedis("cache");
-
+// SQL Server container — name must match builder.AddSqlServerDbContext<CareerHubContext>("careercloud-db") in API
 var sql = builder.AddSqlServer("sql")
-                 .AddDatabase("career-db");
+                 .AddDatabase("careercloud-db");
 
-builder.AddProject<Projects.CareerHub_API>("api")
-       .WithReference(sql);
+builder.AddProject<Projects.CareerHub_API>("careerhub-api")
+       .WithReference(sql)
+       .WaitFor(sql);
 
 builder.Build().Run();

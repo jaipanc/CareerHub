@@ -1,103 +1,100 @@
-﻿namespace CareerHub.API.Domain
+namespace CareerHub.API.Domain;
+
+// ── Company Profile (Aggregate Root) ─────────────────────────────────────────
+public class CompanyProfile
 {
-    public class CompanyProfile
-    {
-        public Guid Id { get; set; }
-        public DateTime RegistrationDate { get; set; }
-        public string? CompanyWebsite { get; set; }
-        public string? ContactPhone { get; set; }
-        public string? ContactName { get; set; }
-        public byte[]? CompanyLogo { get; set; }
+    public Guid     Id               { get; set; }
+    public DateTime RegistrationDate { get; set; }   // DB column: Registration_Date
+    public string?  CompanyWebsite   { get; set; }   // DB column: Company_Website
+    public string?  ContactPhone     { get; set; }   // DB column: Contact_Phone
+    public string?  ContactName      { get; set; }   // DB column: Contact_Name
+    public byte[]?  CompanyLogo      { get; set; }   // DB column: Company_Logo
+    public byte[]?  TimeStamp        { get; set; }   // DB column: Time_Stamp (rowversion)
 
-        // Navigation Properties
-        public virtual ICollection<CompanyDescription> Descriptions { get; set; } = [];
-        public virtual ICollection<CompanyLocation> Locations { get; set; } = [];
-        public virtual ICollection<CompanyJob> Jobs { get; set; } = [];
-    }
+    public virtual ICollection<CompanyDescription> Descriptions { get; set; } = [];
+    public virtual ICollection<CompanyLocation>    Locations    { get; set; } = [];
+    public virtual ICollection<CompanyJob>         Jobs         { get; set; } = [];
+}
 
-    // Localized Description (supports multiple languages per company)
-    public class CompanyDescription
-    {
-        public Guid Id { get; set; }
-        public Guid CompanyId { get; set; }
-        public required string LanguageId { get; set; } // FK to SystemLanguageCode
+// ── Company Description (localized per language) ──────────────────────────────
+public class CompanyDescription
+{
+    public Guid    Id          { get; set; }
+    public Guid    CompanyId   { get; set; }   // DB column: Company
+    public string? LanguageId  { get; set; }   // DB column: LanguageId  → FK to SystemLanguageCode
+    public string? CompanyName { get; set; }   // DB column: Company_Name
+    public string? Description { get; set; }   // DB column: Company_Description
+    public byte[]? TimeStamp   { get; set; }   // DB column: Time_Stamp (rowversion)
 
-        public required string CompanyName { get; set; }
-        public required string Description { get; set; } // Renamed from 'CompanyDescription' to avoid class name clash
+    public virtual CompanyProfile?      CompanyProfile { get; set; }
+    public virtual SystemLanguageCode?  LanguageCode   { get; set; }
+}
 
-        public virtual CompanyProfile? CompanyProfile { get; set; }
-        public virtual SystemLanguageCode? LanguageCode { get; set; }
-    }
+// ── Company Location ──────────────────────────────────────────────────────────
+public class CompanyLocation
+{
+    public Guid    Id          { get; set; }
+    public Guid    CompanyId   { get; set; }   // DB column: Company
+    public string? CountryCode { get; set; }   // DB column: Country_Code
+    public string? Province    { get; set; }   // DB column: State_Province_Code
+    public string? Street      { get; set; }   // DB column: Street_Address
+    public string? City        { get; set; }   // DB column: City_Town
+    public string? PostalCode  { get; set; }   // DB column: Zip_Postal_Code
+    public byte[]? TimeStamp   { get; set; }   // DB column: Time_Stamp (rowversion)
 
-    // A Job Posted by the Company
-    public class CompanyJob
-    {
-        public Guid Id { get; set; }
-        public Guid CompanyId { get; set; }
+    public virtual CompanyProfile? CompanyProfile { get; set; }
+}
 
-        public DateTime ProfileCreated { get; set; }
-        public bool IsInactive { get; set; }
-        public bool IsCompanyHidden { get; set; }
+// ── Company Job ───────────────────────────────────────────────────────────────
+public class CompanyJob
+{
+    public Guid     Id              { get; set; }
+    public Guid     CompanyId       { get; set; }   // DB column: Company
+    public DateTime ProfileCreated  { get; set; }   // DB column: Profile_Created
+    public bool     IsInactive      { get; set; }   // DB column: Is_Inactive
+    public bool     IsCompanyHidden { get; set; }   // DB column: Is_Company_Hidden
+    public byte[]?  TimeStamp       { get; set; }   // DB column: Time_Stamp (rowversion)
 
-        // Job Details (One-to-Many)
-        public virtual ICollection<CompanyJobDescription> Descriptions { get; set; } = [];
-        public virtual ICollection<CompanyJobEducation> Educations { get; set; } = [];
-        public virtual ICollection<CompanyJobSkill> Skills { get; set; } = [];
-        public virtual ICollection<ApplicantJobApplication> Applications { get; set; } = [];
+    public virtual CompanyProfile?                         CompanyProfile { get; set; }
+    public virtual ICollection<CompanyJobDescription>      Descriptions   { get; set; } = [];
+    public virtual ICollection<CompanyJobEducation>        Educations     { get; set; } = [];
+    public virtual ICollection<CompanyJobSkill>            Skills         { get; set; } = [];
+    public virtual ICollection<ApplicantJobApplication>    Applications   { get; set; } = [];
+}
 
-        public virtual CompanyProfile? CompanyProfile { get; set; }
-    }
+// ── Job Description ───────────────────────────────────────────────────────────
+public class CompanyJobDescription
+{
+    public Guid    Id          { get; set; }
+    public Guid    JobId       { get; set; }   // DB column: Job
+    public string? JobName     { get; set; }   // DB column: Job_Name
+    public string? Description { get; set; }   // DB column: Job_Descriptions
+    public byte[]? TimeStamp   { get; set; }   // DB column: Time_Stamp (rowversion)
 
-    // Job Description (Localized)
-    public class CompanyJobDescription
-    {
-        public Guid Id { get; set; }
-        public Guid JobId { get; set; }
+    public virtual CompanyJob? Job { get; set; }
+}
 
-        public required string JobName { get; set; }
-        public required string Description { get; set; } // Renamed from 'JobDescriptions'
+// ── Required Education for the Job ───────────────────────────────────────────
+public class CompanyJobEducation
+{
+    public Guid    Id         { get; set; }
+    public Guid    JobId      { get; set; }   // DB column: Job
+    public string? Major      { get; set; }
+    public short   Importance { get; set; }
+    public byte[]? TimeStamp  { get; set; }   // DB column: Time_Stamp (rowversion)
 
-        public virtual CompanyJob? Job { get; set; }
-    }
+    public virtual CompanyJob? Job { get; set; }
+}
 
-    // Required Education for the Job
-    public class CompanyJobEducation
-    {
-        public Guid Id { get; set; }
-        public Guid JobId { get; set; }
+// ── Required Skills for the Job ───────────────────────────────────────────────
+public class CompanyJobSkill
+{
+    public Guid    Id         { get; set; }
+    public Guid    JobId      { get; set; }   // DB column: Job
+    public string? Skill      { get; set; }
+    public string? SkillLevel { get; set; }   // DB column: Skill_Level
+    public int     Importance { get; set; }
+    public byte[]? TimeStamp  { get; set; }   // DB column: Time_Stamp (rowversion)
 
-        public required string Major { get; set; }
-        public short Importance { get; set; }
-
-        public virtual CompanyJob? Job { get; set; }
-    }
-
-    // Required Skills for the Job
-    public class CompanyJobSkill
-    {
-        public Guid Id { get; set; }
-        public Guid JobId { get; set; }
-
-        public required string Skill { get; set; }
-        public required string SkillLevel { get; set; }
-        public int Importance { get; set; }
-
-        public virtual CompanyJob? Job { get; set; }
-    }
-
-    // Company Locations
-    public class CompanyLocation
-    {
-        public Guid Id { get; set; }
-        public Guid CompanyId { get; set; }
-
-        public required string CountryCode { get; set; }
-        public string? Province { get; set; }
-        public string? Street { get; set; }
-        public string? City { get; set; }
-        public string? PostalCode { get; set; }
-
-        public virtual CompanyProfile? CompanyProfile { get; set; }
-        // Optional: Navigation to SystemCountryCode if you want strict validation
-    }
+    public virtual CompanyJob? Job { get; set; }
 }
